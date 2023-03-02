@@ -18,5 +18,6 @@ func (mc *MovieRouteController) MovieRoute(rg *gin.RouterGroup) {
 	router := rg.Group("movies")
 
 	router.POST("/:movieId/comments", mc.movieController.AddComment)
+	router.GET("/:movieId/comments", mc.movieController.ListComments)
 
 }
