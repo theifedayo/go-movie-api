@@ -8,11 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/theifedayo/go-movie-api/api/models"
 	"github.com/theifedayo/go-movie-api/config"
-
 )
 
-
-func (mc *MovieController) AddComment(ctx *gin.Context) {
+func (mc *MovieController) AddCommentToMovies(ctx *gin.Context) {
 	movieId := ctx.Param("movieId")
 	var payload *models.CreateCommentRequest
 
@@ -39,8 +37,7 @@ func (mc *MovieController) AddComment(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newComment})
 }
 
-
-func (mc *MovieController) ListComments(ctx *gin.Context) {
+func (mc *MovieController) ListCommentsForAMovie(ctx *gin.Context) {
 	movieId := ctx.Param("movieId")
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")

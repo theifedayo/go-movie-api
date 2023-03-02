@@ -18,5 +18,3 @@ type CreateCommentRequest struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
-
-//TODO: Set comment max to 500 characters

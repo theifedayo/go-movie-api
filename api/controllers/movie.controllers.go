@@ -73,7 +73,6 @@ func (mc *MovieController) ListMovies(ctx *gin.Context) {
 
 	for _, movie := range movies.Results {
 
-
 		// Extract the substring between the last two slashes
 		movURL := strings.TrimSuffix(movie.URL, "/")
 		index := strings.LastIndex(movURL, "/")
@@ -84,7 +83,6 @@ func (mc *MovieController) ListMovies(ctx *gin.Context) {
 			fmt.Println("Error:", err)
 			return
 		}
-
 
 		var movieComments []models.Comment
 		results := config.DB.Model(&models.Comment{}).Where("movie_id = ?", strconv.Itoa(movieNumber)).Find(&movieComments)
@@ -97,7 +95,6 @@ func (mc *MovieController) ListMovies(ctx *gin.Context) {
 			Title:        movie.Title,
 			OpeningCrawl: movie.OpeningCrawl,
 			CommentCount: len(movieComments),
-			ReleaseDate:  movie.ReleaseDate,
 		})
 	}
 
