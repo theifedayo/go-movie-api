@@ -1,21 +1,32 @@
 package config
 
 import (
-	"log"
-	"os"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/spf13/viper"
 )
 
-var DB *gorm.DB
+type Config struct {
+	DBHost         string `mapstructure:"POSTGRES_HOST"`
+	DBUserName     string `mapstructure:"POSTGRES_USER"`
+	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
+	DBName         string `mapstructure:"POSTGRES_DB"`
+	DBPort         string `mapstructure:"POSTGRES_PORT"`
+	ServerPort     string `mapstructure:"PORT"`
 
-func ConnectToDB() {
-	var err error
-	dsn := os.Getenv("DB_URL")
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	ClientOrigin string `mapstructure:"CLIENT_ORIGIN"`
+}
 
+func LoadConfig(path string) (config Config, err error) {
+	viper.AddConfigPath(path)
+	viper.SetConfigType("env")
+	viper.SetConfigName(".env")
+
+	viper.AutomaticEnv()
+
+	err = viper.ReadInConfig()
 	if err != nil {
-		log.Fatal("Failed to connect to database")
+		return
 	}
+
+	err = viper.Unmarshal(&config)
+	return
 }
