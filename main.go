@@ -24,6 +24,7 @@ func init() {
 	}
 
 	config.ConnectToDB(&configs)
+	config.SetRedisConfig(&configs)
 
 	server = gin.Default()
 }
