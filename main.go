@@ -6,17 +6,21 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/theifedayo/go-movie-api/api/controllers"
+	"github.com/theifedayo/go-movie-api/api/routes"
 	"github.com/theifedayo/go-movie-api/config"
 )
 
 var (
-	server *gin.Engine
+	server               *gin.Engine
+	MovieController      controllers.MovieController
+	MovieRouteController routes.MovieRouteController
 )
 
 func init() {
 	configs, err := config.LoadConfig(".")
 	if err != nil {
-		log.Fatal("🚀 Could not load environment variables", err)
+		log.Fatal("could not load environment variables", err)
 	}
 
 	config.ConnectToDB(&configs)
@@ -41,6 +45,8 @@ func main() {
 		message := "Welcome to Movie API"
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
 	})
+
+	MovieRouteController.MovieRoute(router)
 
 	log.Fatal(server.Run(":" + configs.ServerPort))
 }
