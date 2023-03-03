@@ -41,7 +41,7 @@ func main() {
 
 	server.Use(cors.New(corsConfig))
 
-	router := server.Group("/api")
+	router := server.Group("/api/v1")
 	router.GET("/healthchecker", func(ctx *gin.Context) {
 		message := "Welcome to Movie API"
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})

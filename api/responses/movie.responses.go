@@ -6,7 +6,7 @@ import (
 
 // MovieResponse represents each movie data returned by the API
 type MovieResponse struct {
-	Title        string `json:"title"`
+	Name         string `json:"name"`
 	OpeningCrawl string `json:"opening_crawl"`
 	CommentCount int    `json:"comment_count"`
 	//ReleaseDate  string `json:"release_date"`
