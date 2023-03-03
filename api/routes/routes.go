@@ -14,14 +14,13 @@ func NewRouteMovieController(movieController controllers.MovieController) MovieR
 }
 
 func (mc *MovieRouteController) MovieRoute(rg *gin.RouterGroup) {
-
+	//api/v1/movies
 	router := rg.Group("movies")
 
+	
 	router.GET("/", mc.movieController.ListMovies)
-
 	router.POST("/:movieId/comments", mc.movieController.AddCommentToMovies)
 	router.GET("/:movieId/comments", mc.movieController.ListCommentsForAMovie)
-
 	//router.GET("/:movieId/characters", mc.movieController.ListCharactersForAMovie)
 
 }

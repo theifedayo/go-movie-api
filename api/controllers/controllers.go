@@ -15,26 +15,22 @@ func NewMovieController(DB *gorm.DB) MovieController {
 }
 
 func (mc *MovieController) ListMovies(ctx *gin.Context) {
-
 	statusCode, result := services.ListMovies(ctx)
-
 	ctx.JSON(statusCode, result)
-
 }
 
 func (mc *MovieController) AddCommentToMovies(ctx *gin.Context) {
 	movieId := ctx.Param("movieId")
-
 	statusCode, result := services.AddCommentToMovies(movieId, ctx)
-
 	ctx.JSON(statusCode, result)
 }
 
 func (mc *MovieController) ListCommentsForAMovie(ctx *gin.Context) {
 	movieId := ctx.Param("movieId")
-
 	statusCode, result := services.ListCommentsForAMovie(movieId, ctx)
-
 	ctx.JSON(statusCode, result)
+}
 
+func (mc *MovieController) GetCharactersForMovie(ctx *gin.Context) {
+	
 }
