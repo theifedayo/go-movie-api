@@ -18,7 +18,6 @@ import (
 func GetCharactersForMovie(movieId string, sortParam string, order string, gender string, ctx *gin.Context) (int, gin.H) {
 	var characters []models.Character
 	var metadata responses.CharacterMetadata
-	//var filteredCharacters []models.Character
 
 	url := fmt.Sprintf("https://swapi.dev/api/films/%s/", movieId)
 
@@ -78,30 +77,14 @@ func GetCharactersForMovie(movieId string, sortParam string, order string, gende
 	}
 
 	// Filter characters by gender, if gender filter is provided
-	// if gender != "" {
-	// 	totalHeightCm = 0
-	// 	for _, character := range characters {
-	// 		if strings.ToLower(character.Gender) == strings.ToLower(gender) {
-	// 			filteredCharacters = append(filteredCharacters, character)
-	// 		}
-	// 	}
-
-	// 	for _, filteredCharacters := range filteredCharacters {
-	// 		heightCm, err := strconv.ParseFloat(strings.Replace(filteredCharacters.Height, ",", "", -1), 64)
-	// 		if err != nil {
-	// 			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
-	// 		}
-	// 		totalHeightCm += heightCm
-	// 	}
-
-	// 	// Sort characters by name
-	// 	sort.Slice(filteredCharacters, func(i, j int) bool {
-	// 		return filteredCharacters[i].Name < filteredCharacters[j].Name
-	// 	})
-
-	// } else {
-	// 	filteredCharacters = characters
-	// }
+	if gender != "" {
+		totalHeightCm = 0
+		characters, totalHeightCm = sortByGender(characters, gender)
+	} else {
+		var filteredCharacters []models.Character
+		filteredCharacters = characters
+		fmt.Println(filteredCharacters)
+	}
 
 	// Sort characters based on given sort parameter
 	switch sortParam {
@@ -142,6 +125,32 @@ func GetCharactersForMovie(movieId string, sortParam string, order string, gende
 	}
 
 }
+
+func sortByGender(characters []models.Character, gender string) ([]models.Character, float64) {
+	var filteredCharacters []models.Character
+	var totalHeightCm float64 = 0
+	for _, character := range characters {
+		if strings.ToLower(character.Gender) == strings.ToLower(gender) {
+			filteredCharacters = append(filteredCharacters, character)
+		}
+	}
+
+	for _, filteredCharacters := range filteredCharacters {
+		heightCm, err := strconv.ParseFloat(strings.Replace(filteredCharacters.Height, ",", "", -1), 64)
+		if err != nil {
+			return characters, heightCm
+		}
+		totalHeightCm += heightCm
+	}
+	// Sort characters by name
+	sort.Slice(filteredCharacters, func(i, j int) bool {
+		return filteredCharacters[i].Name < filteredCharacters[j].Name
+	})
+	characters = filteredCharacters
+	return characters, totalHeightCm
+}
+
+
 
 func sortDescByName(characters []models.Character) []models.Character {
 	sort.Slice(characters, func(i, j int) bool {
