@@ -2,143 +2,113 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
+	"io"
 	"io/ioutil"
+	"math"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/theifedayo/go-movie-api/api/models"
 )
 
-func GetCharactersForMovie(movieID string, ctx *gin.Context) (int, gin.H) {
-	movieId := ctx.Param("movieId")
-	sortBy := ctx.DefaultQuery("sort_by", "name")
-	order := ctx.DefaultQuery("order", "asc")
-	genderFilter := ctx.DefaultQuery("gender", "")
+func GetCharactersForMovie(movieId string, ctx *gin.Context) (int, gin.H) {
+	sortParam := ctx.Query("sort")
+	filterParam := ctx.Query("gender")
 
-	// Fetch the movie from the database or the external API
-	//movie, err := models.GetMovie(movieId)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
+	// Build the URL to fetch characters from swapi.dev API
+	url := "https://swapi.dev/api/films/" + movieId + "/"
 
-	// var movieModel models.Movie
-	// movie := config.DB.Order("created_at desc").Where("movie_id = ?", movieId).Find(&movieModel)
-
-	// Fetch the characters from the external API
-	var characters []models.Character
-	url := fmt.Sprintf("https://swapi.dev/api/films/%s/", movieId)
-	for {
-		resp, err := http.Get(url)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
+	// Add sorting and filtering parameters to the URL if specified
+	if sortParam != "" {
+		url += "?ordering=" + sortParam
+	}
+	if filterParam != "" {
+		if strings.Contains(url, "?") {
+			url += "&"
+		} else {
+			url += "?"
 		}
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		var data struct {
-			Characters []string `json:"characters"`
-			Next       string   `json:"next"`
-		}
-		if err := json.Unmarshal(body, &data); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		for _, characterURL := range data.Characters {
-			character, err := models.GetCharacter(characterURL)
-			if err != nil {
-				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
-
-			// Filter characters by gender if specified
-			if genderFilter != "" && character.Gender != genderFilter {
-				continue
-			}
-
-			characters = append(characters, character)
-		}
-
-		if data.Next == "" {
-			break
-		}
-		url = data.Next
+		url += "gender=" + filterParam
 	}
 
-	// Sort characters by the specified field and order
-	switch strings.ToLower(sortBy) {
-	case "name":
-		if strings.ToLower(order) == "asc" {
-			sort.Slice(characters, func(i, j int) bool {
-				return characters[i].Name < characters[j].Name
-			})
-		} else {
-			sort.Slice(characters, func(i, j int) bool {
-				return characters[i].Name > characters[j].Name
-			})
-		}
-	case "gender":
-		if strings.ToLower(order) == "asc" {
-			sort.Slice(characters, func(i, j int) bool {
-				return characters[i].Gender < characters[j].Gender
-			})
-		} else {
-			sort.Slice(characters, func(i, j int) bool {
-				return characters[i].Gender > characters[j].Gender
-			})
-		}
-	case "height":
-		if strings.ToLower(order) == "asc" {
-			sort.Slice(characters, func(i, j int) bool {
-				return characters[i].Height < characters[j].Height
-			})
-		} else {
-			sort.Slice(characters, func(i, j int) bool {
-				return characters[i].Height > characters[j].Height
-			})
-		}
-	default:
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sort_by parameter"})
-		return
+	// Fetch character data from swapi.dev API
+	resp, err := http.Get(url)
+	if err != nil {
+		return (http.StatusInternalServerError), gin.H{"error": "Failed to fetch character data"}
+
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return (http.StatusNotFound), gin.H{"error": "Movie not found"}
 	}
 
-	totalHeightCm := 0
-	for _, character := range characters {
-		height, err := strconv.Atoi(character.Height)
+	// Parse the response and build the character list and metadata
+	characters, totalHeightCm := parseCharacterData(resp.Body)
+	totalHeightFeet, totalHeightInches := convertCmToFeetAndInches(float64(totalHeightCm))
+	metadata := gin.H{
+		"total_characters": len(characters),
+		"total_height_cm":  totalHeightCm,
+		"total_height_ft":  totalHeightFeet,
+		"total_height_in":  totalHeightInches,
+	}
+
+	// Return the character list and metadata as the response
+	return (http.StatusOK), gin.H{"characters": characters, "metadata": metadata}
+}
+
+func convertCmToFeetAndInches(cm float64) (float64, float64) {
+	// 1 inch = 2.54 cm
+	// 1 foot = 12 inches
+	inches := cm / 2.54
+	feet := math.Floor(inches / 12)
+	inches = inches - (feet * 12)
+	return feet, inches
+}
+
+// Helper function to parse the character data from the swapi.dev API response
+func parseCharacterData(body io.Reader) ([]gin.H, int) {
+	var data map[string]interface{}
+	err := json.NewDecoder(body).Decode(&data)
+	if err != nil {
+		return nil, 0
+	}
+
+	charactersData := data["characters"].([]interface{})
+	var characters []gin.H
+	var totalHeight int
+
+	for _, characterData := range charactersData {
+		characterURL := characterData.(string)
+		characterResp, err := http.Get(characterURL)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
+			continue
 		}
-		totalHeightCm += height
-	}
-	totalHeightInch := float64(totalHeightCm) / 2.54
-	totalHeightFeet := int(totalHeightInch / 12)
-	totalHeightInch = totalHeightInch - float64(totalHeightFeet*12)
-	totalHeight := fmt.Sprintf("%dft %.2fin (%dcm)", totalHeightFeet, totalHeightInch, totalHeightCm)
 
-	// Return the response
-	ctx.JSON(http.StatusOK, gin.H{
-		"metadata": gin.H{
-			"total_count": len(characters),
-			"total_height": gin.H{
-				"cm":   totalHeightCm,
-				"feet": totalHeightFeet,
-				"inch": totalHeightInch,
-				"desc": totalHeight,
-			},
-		},
-		"data": characters,
-	})
-	return
+		characterBody, err := ioutil.ReadAll(characterResp.Body)
+		if err != nil {
+			continue
+		}
+
+		var character map[string]interface{}
+		err = json.Unmarshal(characterBody, &character)
+		if err != nil {
+			continue
+		}
+
+		characters = append(characters, gin.H{
+			"name":   character["name"],
+			"gender": character["gender"],
+			"height": character["height"],
+		})
+
+		// Add the character height to the total height
+		characterHeight, err := strconv.Atoi(character["height"].(string))
+		if err == nil {
+			totalHeight += characterHeight
+		}
+	}
+
+	return characters, totalHeight
 }

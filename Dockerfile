@@ -1,0 +1,30 @@
+FROM golang:1.17
+
+WORKDIR /app
+
+
+COPY . .
+
+# install dependencies
+RUN go mod download
+
+
+
+# Set environment variables from .env file
+ENV POSTGRES_HOST=$POSTGRES_HOST
+ENV POSTGRES_USER=$POSTGRES_USER
+ENV POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+ENV POSTGRES_DB=$POSTGRES_DB
+ENV POSTGRES_PORT=$POSTGRES_PORT
+
+ENV REDIS_ADDRESS=$REDIS_ADDRESS
+ENV REDIS_PASSWORD=$REDIS_PASSWORD
+ENV REDIS_DB=$REDIS_DB
+
+
+
+# expose port
+EXPOSE 8080
+
+# start server
+CMD ["go", "run", "main.go"]

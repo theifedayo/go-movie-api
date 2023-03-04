@@ -32,5 +32,7 @@ func (mc *MovieController) ListCommentsForAMovie(ctx *gin.Context) {
 }
 
 func (mc *MovieController) GetCharactersForMovie(ctx *gin.Context) {
-	
+	movieId := ctx.Param("movieId")
+	statusCode, result := services.GetCharactersForMovie(movieId, ctx)
+	ctx.JSON(statusCode, result)
 }
