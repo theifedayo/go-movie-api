@@ -18,7 +18,7 @@ func AddCommentToMovies(movieId string, ctx *gin.Context) (int, gin.H) {
 		return http.StatusBadRequest, gin.H{"status": "error", "message": err.Error()}
 	}
 
-	now := time.Now()
+	now := time.Now().UTC().Truncate(time.Second)
 	newComment := models.Comment{
 		MovieID:   movieId,
 		Comment:   payload.Comment,

@@ -33,6 +33,7 @@ func ListMovies(ctx *gin.Context) (int, gin.H) {
 		}
 
 		fmt.Println(err)
+		return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
 	}
 
 	resp, err := http.Get("https://swapi.dev/api/films/")
@@ -88,7 +89,8 @@ func ListMovies(ctx *gin.Context) (int, gin.H) {
 
 	cacheValue, err := json.Marshal(movieResponses)
 	if err == nil {
-		err := config.SetCache(cacheKey, string(cacheValue), 1*time.Minute)
+		//cache expiration time set to 5 minutes
+		err := config.SetCache(cacheKey, string(cacheValue), 5*time.Minute)
 		if err != nil {
 			fmt.Println(err)
 		}

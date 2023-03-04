@@ -16,3 +16,10 @@ type MovieResponse struct {
 type MovieListResponse struct {
 	Results []models.Movie `json:"results"`
 }
+
+type CharacterMetadata struct {
+	TotalCharacters int     `json:"total_characters"`
+	TotalHeightCm   float64 `json:"total_height_cm"`
+	TotalHeightFt   float64 `json:"total_height_ft"`
+	TotalHeightIn   float64 `json:"total_height_"`
+}

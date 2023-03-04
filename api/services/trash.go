@@ -1,11 +1,12 @@
 package services
 
-func All() {}
+func trash() {}
 
 // import (
 // 	"encoding/json"
 // 	"fmt"
 // 	"io/ioutil"
+// 	"math"
 // 	"net/http"
 // 	"sort"
 // 	"strconv"
@@ -13,150 +14,176 @@ func All() {}
 
 // 	"github.com/gin-gonic/gin"
 // 	"github.com/theifedayo/go-movie-api/api/models"
+// 	"github.com/theifedayo/go-movie-api/api/responses"
 // )
 
-// func GetCharactersForMovies(movieId string, ctx *gin.Context) (int, gin.H) {
-// 	sortBy := ctx.DefaultQuery("sort_by", "name")
-// 	order := ctx.DefaultQuery("order", "asc")
-// 	genderFilter := ctx.DefaultQuery("gender", "")
-
-// 	// Fetch the movie from the database or the external API
-// 	movie, err := GetMovie(movieId)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	// Fetch the characters from the external API
+// func GetCharactersForMovie(movieId string, ctx *gin.Context) (int, gin.H) {
 // 	var characters []models.Character
+// 	var metadata responses.CharacterMetadata
+
 // 	url := fmt.Sprintf("https://swapi.dev/api/films/%s/", movieId)
-// 	for {
-// 		resp, err := http.Get(url)
-// 		if err != nil {
-// 			return (http.StatusInternalServerError), gin.H{"error": err.Error()}
 
-// 		}
-// 		defer resp.Body.Close()
-
-// 		body, err := ioutil.ReadAll(resp.Body)
-// 		if err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 			return
-// 		}
-
-// 		var data struct {
-// 			Characters []string `json:"characters"`
-// 			Next       string   `json:"next"`
-// 		}
-// 		if err := json.Unmarshal(body, &data); err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 			return
-// 		}
-
-// 		for _, characterURL := range data.Characters {
-// 			character, err := models.GetCharacter(characterURL)
-// 			if err != nil {
-// 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 				return
-// 			}
-
-// 			// Filter characters by gender if specified
-// 			if genderFilter != "" && character.Gender != genderFilter {
-// 				continue
-// 			}
-
-// 			characters = append(characters, character)
-// 		}
-
-// 		if data.Next == "" {
-// 			break
-// 		}
-// 		url = data.Next
+// 	res, err := http.Get(url)
+// 	if err != nil {
+// 		return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
 // 	}
 
-// 	// Sort characters by the specified field and order
-// 	switch strings.ToLower(sortBy) {
-// 	case "name":
-// 		if strings.ToLower(order) == "asc" {
-// 			sort.Slice(characters, func(i, j int) bool {
-// 				return characters[i].Name < characters[j].Name
-// 			})
-// 		} else {
-// 			sort.Slice(characters, func(i, j int) bool {
-// 				return characters[i].Name > characters[j].Name
-// 			})
-// 		}
-// 	case "gender":
-// 		if strings.ToLower(order) == "asc" {
-// 			sort.Slice(characters, func(i, j int) bool {
-// 				return characters[i].Gender < characters[j].Gender
-// 			})
-// 		} else {
-// 			sort.Slice(characters, func(i, j int) bool {
-// 				return characters[i].Gender > characters[j].Gender
-// 			})
-// 		}
-// 	case "height":
-// 		if strings.ToLower(order) == "asc" {
-// 			sort.Slice(characters, func(i, j int) bool {
-// 				return characters[i].Height < characters[j].Height
-// 			})
-// 		} else {
-// 			sort.Slice(characters, func(i, j int) bool {
-// 				return characters[i].Height > characters[j].Height
-// 			})
-// 		}
-// 	default:
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sort_by parameter"})
-// 		return
+// 	defer res.Body.Close()
+// 	body, err := ioutil.ReadAll(res.Body)
+// 	if err != nil {
+// 		return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
 // 	}
 
-// 	totalHeightCm := 0
-// 	for _, character := range characters {
-// 		height, err := strconv.Atoi(character.Height)
+// 	var movieData map[string]interface{}
+// 	err = json.Unmarshal(body, &movieData)
+// 	if err != nil {
+// 		return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+// 	}
+
+// 	charactersUrls := movieData["characters"].([]interface{})
+
+// 	metadata.TotalCharacters = len(charactersUrls)
+
+// 	var totalHeightCm float64 = 0
+
+// 	for _, characterUrl := range charactersUrls {
+// 		res, err := http.Get(characterUrl.(string))
 // 		if err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 			return
+// 			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
 // 		}
-// 		totalHeightCm += height
-// 	}
-// 	totalHeightInch := float64(totalHeightCm) / 2.54
-// 	totalHeightFeet := int(totalHeightInch / 12)
-// 	totalHeightInch = totalHeightInch - float64(totalHeightFeet*12)
-// 	totalHeight := fmt.Sprintf("%dft %.2fin (%dcm)", totalHeightFeet, totalHeightInch, totalHeightCm)
 
-// 	// Return the response
-// 	c.JSON(http.StatusOK, gin.H{
+// 		defer res.Body.Close()
+// 		body, err := ioutil.ReadAll(res.Body)
+// 		if err != nil {
+// 			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+// 		}
+
+// 		var characterData map[string]interface{}
+// 		err = json.Unmarshal(body, &characterData)
+// 		if err != nil {
+// 			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+// 		}
+
+// 		heightCm, err := strconv.ParseFloat(strings.Replace(characterData["height"].(string), ",", "", -1), 64)
+// 		if err != nil {
+// 			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+// 		}
+
+// 		totalHeightCm += heightCm
+
+// 		characters = append(characters, models.Character{
+// 			Name:   characterData["name"].(string),
+// 			Height: characterData["height"].(string),
+// 			Gender: characterData["gender"].(string),
+// 		})
+// 	}
+
+// 	metadata.TotalHeightCm = totalHeightCm
+// 	metadata.TotalHeightFt = cmToFeet(totalHeightCm)
+// 	metadata.TotalHeightIn = cmToInch(totalHeightCm)
+
+// 	return (http.StatusOK), gin.H{
 // 		"metadata": gin.H{
 // 			"total_count": len(characters),
 // 			"total_height": gin.H{
-// 				"cm":   totalHeightCm,
-// 				"feet": totalHeightFeet,
-// 				"inch": totalHeightInch,
-// 				"desc": totalHeight,
+// 				"cm":   metadata.TotalHeightCm,
+// 				"feet": metadata.TotalHeightFt,
+// 				"inch": metadata.TotalHeightIn,
 // 			},
 // 		},
 // 		"data": characters,
-// 	})
-// 	return
+// 	}
 
 // }
 
-// func GetCharacter(characterURL string) (*models.Character, error) {
-// 	resp, err := http.Get(characterURL)
+// func GetSortedAndFilteredCharacters(sortBy string, sortOrder string, filterByGender string) (characters []models.Character, metadata map[string]interface{}, err error) {
+// 	// Get all characters from SWAPI
+// 	allCharacters, err := GetAllCharacters()
 // 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer resp.Body.Close()
-
-// 	if resp.StatusCode != http.StatusOK {
-// 		return nil, fmt.Errorf("failed to get character %s: %s", characterURL, resp.Status)
+// 		return nil, nil, err
 // 	}
 
-// 	var character models.Character
-// 	if err := json.NewDecoder(resp.Body).Decode(&character); err != nil {
-// 		return nil, err
+// 	// Filter characters by gender if filterByGender is provided
+// 	if filterByGender != "" {
+// 		filteredCharacters := make([]models.Character, 0)
+// 		for _, c := range allCharacters {
+// 			if c.Gender == filterByGender {
+// 				filteredCharacters = append(filteredCharacters, c)
+// 			}
+// 		}
+// 		allCharacters = filteredCharacters
 // 	}
 
-// 	return &character, nil
+// 	// Sort characters by sortBy field and sortOrder direction
+// 	switch sortBy {
+// 	case "name":
+// 		if sortOrder == "asc" {
+// 			sort.SliceStable(allCharacters, func(i, j int) bool {
+// 				return allCharacters[i].Name < allCharacters[j].Name
+// 			})
+// 		} else {
+// 			sort.SliceStable(allCharacters, func(i, j int) bool {
+// 				return allCharacters[i].Name > allCharacters[j].Name
+// 			})
+// 		}
+// 	case "gender":
+// 		if sortOrder == "asc" {
+// 			sort.SliceStable(allCharacters, func(i, j int) bool {
+// 				return allCharacters[i].Gender < allCharacters[j].Gender
+// 			})
+// 		} else {
+// 			sort.SliceStable(allCharacters, func(i, j int) bool {
+// 				return allCharacters[i].Gender > allCharacters[j].Gender
+// 			})
+// 		}
+// 	case "height":
+// 		if sortOrder == "asc" {
+// 			sort.SliceStable(allCharacters, func(i, j int) bool {
+// 				return allCharacters[i].Height < allCharacters[j].Height
+// 			})
+// 		} else {
+// 			sort.SliceStable(allCharacters, func(i, j int) bool {
+// 				return allCharacters[i].Height > allCharacters[j].Height
+// 			})
+// 		}
+// 	}
+
+// 	// Calculate total number of characters that match the criteria
+// 	numCharacters := len(allCharacters)
+
+// 	// Calculate total height of characters in cm and convert to feet/inches
+// 	var totalHeightCm float64 = 0
+// 	for _, c := range allCharacters {
+// 		height, err := strconv.ParseFloat(c.Height)
+// 		//heightCm, err := strconv.ParseFloat(strings.Replace(characterData["height"].(string), ",", "", -1), 64)
+// 		if err != nil {
+// 			continue
+// 		}
+// 		totalHeightCm += height
+// 	}
+// 	totalHeightFt := cmToFeet(totalHeightCm)
+// 	totalHeightIn := cmToInch(totalHeightCm)
+
+// 	// Create metadata map
+// 	metadata = make(map[string]interface{})
+// 	metadata["num_characters"] = numCharacters
+// 	metadata["total_height_cm"] = totalHeightCm
+// 	metadata["total_height_ft"] = totalHeightFt
+// 	metadata["total_height_ft"] = totalHeightIn
+
+// 	return allCharacters, metadata, nil
+
+// }
+
+// func cmToFeet(cm float64) float64 {
+// 	inches := cm * 0.3937
+// 	feet := math.Floor(inches / 12)
+// 	return feet
+// }
+
+// func cmToInch(cm float64) float64 {
+// 	inches := cm * 0.3937
+// 	feet := math.Floor(inches / 12)
+// 	inches = math.Round(inches - (feet * 12))
+// 	return inches
 // }

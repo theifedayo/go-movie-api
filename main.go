@@ -9,6 +9,9 @@ import (
 	"github.com/theifedayo/go-movie-api/api/controllers"
 	"github.com/theifedayo/go-movie-api/api/routes"
 	"github.com/theifedayo/go-movie-api/config"
+	// "github.com/swaggo/files"
+	// "github.com/swaggo/gin-swagger/v2"
+	// "github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 var (
@@ -46,6 +49,12 @@ func main() {
 		message := "Welcome to Movie API"
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
 	})
+
+	// register the Swagger route and Swagger UI route
+	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// router.GET("/docs", func(c *gin.Context) {
+	//     c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	// })
 
 	MovieRouteController.MovieRoute(router)
 
