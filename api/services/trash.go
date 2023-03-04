@@ -2,6 +2,8 @@ package services
 
 func trash() {}
 
+// package services
+
 // import (
 // 	"encoding/json"
 // 	"fmt"
@@ -17,9 +19,10 @@ func trash() {}
 // 	"github.com/theifedayo/go-movie-api/api/responses"
 // )
 
-// func GetCharactersForMovie(movieId string, ctx *gin.Context) (int, gin.H) {
+// func GetCharactersForMovie(movieId string, gender string, ctx *gin.Context) (int, gin.H) {
 // 	var characters []models.Character
 // 	var metadata responses.CharacterMetadata
+// 	var filteredCharacters []models.Character
 
 // 	url := fmt.Sprintf("https://swapi.dev/api/films/%s/", movieId)
 
@@ -78,100 +81,47 @@ func trash() {}
 // 		})
 // 	}
 
+// 	// Filter characters by gender, if gender filter is provided
+// 	if gender != "" {
+// 		totalHeightCm = 0
+// 		for _, character := range characters {
+// 			if strings.ToLower(character.Gender) == strings.ToLower(gender) {
+// 				filteredCharacters = append(filteredCharacters, character)
+// 			}
+// 		}
+
+// 		for _, filteredCharacters := range filteredCharacters {
+// 			heightCm, err := strconv.ParseFloat(strings.Replace(filteredCharacters.Height, ",", "", -1), 64)
+// 			if err != nil {
+// 				return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+// 			}
+// 			totalHeightCm += heightCm
+// 		}
+
+// 		// Sort characters by name
+// 		sort.Slice(filteredCharacters, func(i, j int) bool {
+// 			return filteredCharacters[i].Name < filteredCharacters[j].Name
+// 		})
+
+// 	} else {
+// 		filteredCharacters = characters
+// 	}
+
 // 	metadata.TotalHeightCm = totalHeightCm
 // 	metadata.TotalHeightFt = cmToFeet(totalHeightCm)
 // 	metadata.TotalHeightIn = cmToInch(totalHeightCm)
 
 // 	return (http.StatusOK), gin.H{
 // 		"metadata": gin.H{
-// 			"total_count": len(characters),
+// 			"total_count": len(filteredCharacters),
 // 			"total_height": gin.H{
 // 				"cm":   metadata.TotalHeightCm,
 // 				"feet": metadata.TotalHeightFt,
 // 				"inch": metadata.TotalHeightIn,
 // 			},
 // 		},
-// 		"data": characters,
+// 		"data": filteredCharacters,
 // 	}
-
-// }
-
-// func GetSortedAndFilteredCharacters(sortBy string, sortOrder string, filterByGender string) (characters []models.Character, metadata map[string]interface{}, err error) {
-// 	// Get all characters from SWAPI
-// 	allCharacters, err := GetAllCharacters()
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
-
-// 	// Filter characters by gender if filterByGender is provided
-// 	if filterByGender != "" {
-// 		filteredCharacters := make([]models.Character, 0)
-// 		for _, c := range allCharacters {
-// 			if c.Gender == filterByGender {
-// 				filteredCharacters = append(filteredCharacters, c)
-// 			}
-// 		}
-// 		allCharacters = filteredCharacters
-// 	}
-
-// 	// Sort characters by sortBy field and sortOrder direction
-// 	switch sortBy {
-// 	case "name":
-// 		if sortOrder == "asc" {
-// 			sort.SliceStable(allCharacters, func(i, j int) bool {
-// 				return allCharacters[i].Name < allCharacters[j].Name
-// 			})
-// 		} else {
-// 			sort.SliceStable(allCharacters, func(i, j int) bool {
-// 				return allCharacters[i].Name > allCharacters[j].Name
-// 			})
-// 		}
-// 	case "gender":
-// 		if sortOrder == "asc" {
-// 			sort.SliceStable(allCharacters, func(i, j int) bool {
-// 				return allCharacters[i].Gender < allCharacters[j].Gender
-// 			})
-// 		} else {
-// 			sort.SliceStable(allCharacters, func(i, j int) bool {
-// 				return allCharacters[i].Gender > allCharacters[j].Gender
-// 			})
-// 		}
-// 	case "height":
-// 		if sortOrder == "asc" {
-// 			sort.SliceStable(allCharacters, func(i, j int) bool {
-// 				return allCharacters[i].Height < allCharacters[j].Height
-// 			})
-// 		} else {
-// 			sort.SliceStable(allCharacters, func(i, j int) bool {
-// 				return allCharacters[i].Height > allCharacters[j].Height
-// 			})
-// 		}
-// 	}
-
-// 	// Calculate total number of characters that match the criteria
-// 	numCharacters := len(allCharacters)
-
-// 	// Calculate total height of characters in cm and convert to feet/inches
-// 	var totalHeightCm float64 = 0
-// 	for _, c := range allCharacters {
-// 		height, err := strconv.ParseFloat(c.Height)
-// 		//heightCm, err := strconv.ParseFloat(strings.Replace(characterData["height"].(string), ",", "", -1), 64)
-// 		if err != nil {
-// 			continue
-// 		}
-// 		totalHeightCm += height
-// 	}
-// 	totalHeightFt := cmToFeet(totalHeightCm)
-// 	totalHeightIn := cmToInch(totalHeightCm)
-
-// 	// Create metadata map
-// 	metadata = make(map[string]interface{})
-// 	metadata["num_characters"] = numCharacters
-// 	metadata["total_height_cm"] = totalHeightCm
-// 	metadata["total_height_ft"] = totalHeightFt
-// 	metadata["total_height_ft"] = totalHeightIn
-
-// 	return allCharacters, metadata, nil
 
 // }
 

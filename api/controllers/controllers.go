@@ -14,8 +14,6 @@ func NewMovieController(DB *gorm.DB) MovieController {
 	return MovieController{DB}
 }
 
-
-
 // @Summary Get a list of movies
 // @Description Retrieves a list of movies sorted by release date, along with opening crawls and comment count
 // @Accept  json
@@ -41,8 +39,9 @@ func (mc *MovieController) ListCommentsForAMovie(ctx *gin.Context) {
 
 func (mc *MovieController) GetCharactersForMovie(ctx *gin.Context) {
 	movieId := ctx.Param("movieId")
-	sortParam := ctx.Query("sort")
-	filterParam := ctx.Query("filter")
-	statusCode, result := services.GetCharactersForMovie(movieId, ctx)
+	gender := ctx.Query("gender")
+	sort := ctx.Query("sort")
+	order := ctx.Query("order")
+	statusCode, result := services.GetCharactersForMovie(movieId, sort, order, gender, ctx)
 	ctx.JSON(statusCode, result)
 }

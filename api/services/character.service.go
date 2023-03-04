@@ -15,9 +15,10 @@ import (
 	"github.com/theifedayo/go-movie-api/api/responses"
 )
 
-func GetCharactersForMovie(movieId string, ctx *gin.Context) (int, gin.H) {
+func GetCharactersForMovie(movieId string, sortParam string, order string, gender string, ctx *gin.Context) (int, gin.H) {
 	var characters []models.Character
 	var metadata responses.CharacterMetadata
+	//var filteredCharacters []models.Character
 
 	url := fmt.Sprintf("https://swapi.dev/api/films/%s/", movieId)
 
@@ -76,6 +77,54 @@ func GetCharactersForMovie(movieId string, ctx *gin.Context) (int, gin.H) {
 		})
 	}
 
+	// Filter characters by gender, if gender filter is provided
+	// if gender != "" {
+	// 	totalHeightCm = 0
+	// 	for _, character := range characters {
+	// 		if strings.ToLower(character.Gender) == strings.ToLower(gender) {
+	// 			filteredCharacters = append(filteredCharacters, character)
+	// 		}
+	// 	}
+
+	// 	for _, filteredCharacters := range filteredCharacters {
+	// 		heightCm, err := strconv.ParseFloat(strings.Replace(filteredCharacters.Height, ",", "", -1), 64)
+	// 		if err != nil {
+	// 			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+	// 		}
+	// 		totalHeightCm += heightCm
+	// 	}
+
+	// 	// Sort characters by name
+	// 	sort.Slice(filteredCharacters, func(i, j int) bool {
+	// 		return filteredCharacters[i].Name < filteredCharacters[j].Name
+	// 	})
+
+	// } else {
+	// 	filteredCharacters = characters
+	// }
+
+	// Sort characters based on given sort parameter
+	switch sortParam {
+	case "name":
+		if order == "desc" {
+			characters = sortDescByName(characters)
+		} else {
+			characters = sortAscByName(characters)
+		}
+	case "gender":
+		if order == "desc" {
+			characters = sortDescByGender(characters)
+		} else {
+			characters = sortAscByGender(characters)
+		}
+	case "height":
+		if order == "desc" {
+			characters = sortDescByHeight(characters)
+		} else {
+			characters = sortAscByHeight(characters)
+		}
+	}
+
 	metadata.TotalHeightCm = totalHeightCm
 	metadata.TotalHeightFt = cmToFeet(totalHeightCm)
 	metadata.TotalHeightIn = cmToInch(totalHeightCm)
@@ -94,83 +143,46 @@ func GetCharactersForMovie(movieId string, ctx *gin.Context) (int, gin.H) {
 
 }
 
-func GetSortedAndFilteredCharacters(sortBy string, sortOrder string, filterByGender string) (characters []models.Character, metadata map[string]interface{}, err error) {
-	// Get all characters from SWAPI
-	allCharacters, err := GetAllCharacters()
-	if err != nil {
-		return nil, nil, err
-	}
+func sortDescByName(characters []models.Character) []models.Character {
+	sort.Slice(characters, func(i, j int) bool {
+		return characters[i].Name > characters[j].Name
+	})
+	return characters
+}
 
-	// Filter characters by gender if filterByGender is provided
-	if filterByGender != "" {
-		filteredCharacters := make([]models.Character, 0)
-		for _, c := range allCharacters {
-			if c.Gender == filterByGender {
-				filteredCharacters = append(filteredCharacters, c)
-			}
-		}
-		allCharacters = filteredCharacters
-	}
+func sortAscByName(characters []models.Character) []models.Character {
+	sort.Slice(characters, func(i, j int) bool {
+		return characters[i].Name < characters[j].Name
+	})
+	return characters
+}
 
-	// Sort characters by sortBy field and sortOrder direction
-	switch sortBy {
-	case "name":
-		if sortOrder == "asc" {
-			sort.SliceStable(allCharacters, func(i, j int) bool {
-				return allCharacters[i].Name < allCharacters[j].Name
-			})
-		} else {
-			sort.SliceStable(allCharacters, func(i, j int) bool {
-				return allCharacters[i].Name > allCharacters[j].Name
-			})
-		}
-	case "gender":
-		if sortOrder == "asc" {
-			sort.SliceStable(allCharacters, func(i, j int) bool {
-				return allCharacters[i].Gender < allCharacters[j].Gender
-			})
-		} else {
-			sort.SliceStable(allCharacters, func(i, j int) bool {
-				return allCharacters[i].Gender > allCharacters[j].Gender
-			})
-		}
-	case "height":
-		if sortOrder == "asc" {
-			sort.SliceStable(allCharacters, func(i, j int) bool {
-				return allCharacters[i].Height < allCharacters[j].Height
-			})
-		} else {
-			sort.SliceStable(allCharacters, func(i, j int) bool {
-				return allCharacters[i].Height > allCharacters[j].Height
-			})
-		}
-	}
+func sortDescByGender(characters []models.Character) []models.Character {
+	sort.Slice(characters, func(i, j int) bool {
+		return characters[i].Gender > characters[j].Gender
+	})
+	return characters
+}
 
-	// Calculate total number of characters that match the criteria
-	numCharacters := len(allCharacters)
+func sortAscByGender(characters []models.Character) []models.Character {
+	sort.Slice(characters, func(i, j int) bool {
+		return characters[i].Gender < characters[j].Gender
+	})
+	return characters
+}
 
-	// Calculate total height of characters in cm and convert to feet/inches
-	var totalHeightCm float64 = 0
-	for _, c := range allCharacters {
-		height, err := strconv.ParseFloat(c.Height)
-		//heightCm, err := strconv.ParseFloat(strings.Replace(characterData["height"].(string), ",", "", -1), 64)
-		if err != nil {
-			continue
-		}
-		totalHeightCm += height
-	}
-	totalHeightFt := cmToFeet(totalHeightCm)
-	totalHeightIn := cmToInch(totalHeightCm)
+func sortDescByHeight(characters []models.Character) []models.Character {
+	sort.Slice(characters, func(i, j int) bool {
+		return characters[i].Height > characters[j].Height
+	})
+	return characters
+}
 
-	// Create metadata map
-	metadata = make(map[string]interface{})
-	metadata["num_characters"] = numCharacters
-	metadata["total_height_cm"] = totalHeightCm
-	metadata["total_height_ft"] = totalHeightFt
-	metadata["total_height_ft"] = totalHeightIn
-
-	return allCharacters, metadata, nil
-	
+func sortAscByHeight(characters []models.Character) []models.Character {
+	sort.Slice(characters, func(i, j int) bool {
+		return characters[i].Height < characters[j].Height
+	})
+	return characters
 }
 
 func cmToFeet(cm float64) float64 {
