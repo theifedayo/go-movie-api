@@ -15,11 +15,10 @@ func NewMovieController(DB *gorm.DB) MovieController {
 }
 
 // @Summary Get a list of movies
-// @Description Retrieves a list of movies sorted by release date, along with opening crawls and comment count
+// @Description Retrieves a list of movies sorted by release date, along with name, opening crawls and comment count
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} MoviesResponse
-// @Router /movies [get]
+// @Router /api/v1/movies [get]
 func (mc *MovieController) ListMovies(ctx *gin.Context) {
 	statusCode, result := services.ListMovies(ctx)
 	ctx.JSON(statusCode, result)

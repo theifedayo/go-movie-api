@@ -15,6 +15,10 @@ import (
 	"github.com/theifedayo/go-movie-api/api/responses"
 )
 
+// GetCharactersForMovie gets the list of characters a specific movie.
+// It takes a Context of ctx and the Id of the movie to get all its comments as a parameter and returns a status code, as well as a map containing necessary information.
+// It can also accept sort parameters to sort by one of name, gender or height in ascending or descending order and filter parameter to filter by gender.
+// It also returns error status code and a map of error message if one occurs
 func GetCharactersForMovie(movieId string, sortParam string, order string, gender string, ctx *gin.Context) (int, gin.H) {
 	var characters []models.Character
 	var metadata responses.CharacterMetadata
@@ -125,6 +129,9 @@ func GetCharactersForMovie(movieId string, sortParam string, order string, gende
 	}
 
 }
+
+
+//** Character Service Helpers**//
 
 func sortByGender(characters []models.Character, gender string) ([]models.Character, float64) {
 	var filteredCharacters []models.Character

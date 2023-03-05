@@ -10,6 +10,7 @@ import (
 
 var RedisClient *redis.Client
 
+// SetRedisConfig sets the configuration values for RedisClient.
 func SetRedisConfig(config *Config) {
 	RedisClient = redis.NewClient(&redis.Options{
 		Addr:     config.RedisAddress,
@@ -25,7 +26,8 @@ func SetRedisConfig(config *Config) {
 	fmt.Println("Connected successfully to redis server")
 }
 
-
+// GetCache gets the value saved set by a key.
+// It takes a key and expiration as parameters and returns the cached result.
 func GetCache(key string, expiration time.Duration) (string, error) {
 	cacheResult, err := RedisClient.Get(RedisClient.Context(), key).Result()
 	if err != nil {
@@ -39,7 +41,8 @@ func GetCache(key string, expiration time.Duration) (string, error) {
 	return cacheResult, nil
 }
 
-
+// SetCache sets the value assigned to a key.
+// It takes a key, value to be saved and expiration as parameters.
 func SetCache(key string, value string, expiration time.Duration) error {
 	err := RedisClient.Set(RedisClient.Context(), key, value, expiration).Err()
 	if err != nil {

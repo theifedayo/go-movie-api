@@ -10,6 +10,10 @@ import (
 	"github.com/theifedayo/go-movie-api/config"
 )
 
+
+// AddCommentToMovies adds a new comment for a movie.
+// It takes a Context of ctx and the Id of the movie to add comment as a parameter and returns a status code, as well as a map containing necessary information.
+// It also returns error status code and a map of error message if one occurs
 func AddCommentToMovies(movieId string, ctx *gin.Context) (int, gin.H) {
 	var payload *models.CreateCommentRequest
 
@@ -34,6 +38,10 @@ func AddCommentToMovies(movieId string, ctx *gin.Context) (int, gin.H) {
 	return (http.StatusCreated), gin.H{"status": "success", "data": newComment}
 }
 
+
+// ListCommentsForAMovie lists the comments for a specific movie.
+// It takes a Context of ctx and the Id of the movie to get all its comments as a parameter and returns a status code, as well as a map containing necessary information.
+// It also returns error status code and a map of error message if one occurs
 func ListCommentsForAMovie(movieId string, ctx *gin.Context) (int, gin.H) {
 	var page = ctx.DefaultQuery("page", "1")
 	var limit = ctx.DefaultQuery("limit", "10")

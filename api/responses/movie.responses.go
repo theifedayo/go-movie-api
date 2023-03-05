@@ -17,6 +17,7 @@ type MovieListResponse struct {
 	Results []models.Movie `json:"results"`
 }
 
+// CharacterMetadata represents the meta data returned by the API for total characters
 type CharacterMetadata struct {
 	TotalCharacters int     `json:"total_characters"`
 	TotalHeightCm   float64 `json:"total_height_cm"`

@@ -6,12 +6,13 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"github.com/theifedayo/go-movie-api/api/controllers"
 	"github.com/theifedayo/go-movie-api/api/routes"
 	"github.com/theifedayo/go-movie-api/config"
-	// "github.com/swaggo/files"
-	// "github.com/swaggo/gin-swagger/v2"
-	// "github.com/swaggo/gin-swagger/swaggerFiles"
+	_ "github.com/theifedayo/go-movie-api/docs"
 )
 
 var (
@@ -25,13 +26,15 @@ func init() {
 	if err != nil {
 		log.Fatal("could not load environment variables", err)
 	}
-
+	//Initialize the database connection
 	config.ConnectToDB(&configs)
+	//Initialize the Redis client
 	config.SetRedisConfig(&configs)
 
 	server = gin.Default()
 }
 
+// @Title Go Movie API
 func main() {
 	configs, err := config.LoadConfig(".")
 	if err != nil {
@@ -50,11 +53,11 @@ func main() {
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
 	})
 
-	// register the Swagger route and Swagger UI route
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// router.GET("/docs", func(c *gin.Context) {
-	//     c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
-	// })
+	//register the Swagger route and Swagger UI route
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/docs", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
 
 	MovieRouteController.MovieRoute(router)
 

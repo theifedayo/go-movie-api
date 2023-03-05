@@ -1,0 +1,15 @@
+info:
+  contact: {}
+  title: Go Movie API
+paths:
+  /api/v1/movies:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of movies sorted by release date, along with opening
+        crawls and comment count
+      produces:
+      - application/json
+      responses: {}
+      summary: Get a list of movies
+swagger: "2.0"

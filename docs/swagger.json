@@ -1,0 +1,22 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Go Movie API",
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/movies": {
+            "get": {
+                "description": "Retrieves a list of movies sorted by release date, along with opening crawls and comment count",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a list of movies",
+                "responses": {}
+            }
+        }
+    }
+}

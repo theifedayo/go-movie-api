@@ -21,6 +21,7 @@ type Config struct {
 	ClientOrigin string `mapstructure:"CLIENT_ORIGIN"`
 }
 
+// LoadConfig sets the .env path and loads all config parameters sets.
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigType("env")
@@ -37,6 +38,9 @@ func LoadConfig(path string) (config Config, err error) {
 	return
 }
 
+// GetIPAddress gets the IP Address of user connected to the server.
+// The function is used to get IP Address of any user that comments on movie.
+// It returns the IP Address as a string
 func GetIPAddress() string {
 	ifaces, err := net.Interfaces()
 	if err != nil {

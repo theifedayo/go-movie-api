@@ -10,6 +10,8 @@ import (
 
 var DB *gorm.DB
 
+// ConnectToDB connects the app to postgres with gotm.
+// It takes config as parameters.
 func ConnectToDB(config *Config) {
 	var err error
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", config.DBHost, config.DBUserName, config.DBUserPassword, config.DBName, config.DBPort)

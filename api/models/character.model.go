@@ -4,6 +4,8 @@ type Character struct {
 	Name   string `json:"name"`
 	Height string `json:"height"`
 	Gender string `json:"gender"`
+
+	//Needed before: These are other fields returned in Character from SWAPI
 	// Mass      string   `json:"mass"`
 	// HairColor string   `json:"hair_color"`
 	// SkinColor string   `json:"skin_color"`
