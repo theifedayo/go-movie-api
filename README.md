@@ -266,4 +266,4 @@ The response for request failures or any other error are rather simple.
 
 </br>
 
-You can find additional documentation for this API, including request and response signatures, by visiting http://localhost:8080/docs/index.html in your web browser.
+You can find additional documentation for this API, including request and response signatures, by visiting http://localhost:8080/api/v1/docs/index.html in your web browser.

@@ -37,7 +37,6 @@ func init() {
 // @title Go Movie API
 // @version 1.0
 // @description This is a RESTful API that provides information about Star Wars movies.
-
 // @host 0.0.0.0:8080
 // @BasePath /api/v1
 func main() {
@@ -57,9 +56,6 @@ func main() {
 
 	//register the Swagger route and Swagger UI route
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// router.GET("/docs", func(c *gin.Context) {
-	// 	c.Redirect(http.StatusMovedPermanently, "/docs/index.html")
-	// })
 
 	MovieRouteController.MovieRoute(router)
 

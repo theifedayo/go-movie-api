@@ -148,7 +148,6 @@ func sortByGender(characters []models.Character, gender string) ([]models.Charac
 		}
 		totalHeightCm += heightCm
 	}
-	// Sort characters by name
 	sort.Slice(filteredCharacters, func(i, j int) bool {
 		return filteredCharacters[i].Name < filteredCharacters[j].Name
 	})
