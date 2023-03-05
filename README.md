@@ -39,7 +39,7 @@ CLIENT_ORIGIN=
 
 ### Running Server
 #### Locally
-This project depends on redis to cache list of movies, to have everything run well, you have to run redis server
+This project depends on redis to cache list of movies. In order to have everything run well, you have to run redis server
 ```bash
 redis-server
 ```
@@ -266,4 +266,5 @@ The response for request failures or any other error are rather simple.
 
 </br>
 
-You can find additional documentation for this API, including request and response signatures, by visiting http://localhost:8080/api/v1/docs/index.html in your web browser.
+### Conclusion
+You can find additional documentation for this API, including request and response signatures, by visiting http://0.0.0.0:8080/api/v1/docs/index.html if running on your local server, or http://gomovie-api.herokuapp.com/api/v1/docs/index.html in your web browser.
