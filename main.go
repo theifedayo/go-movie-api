@@ -34,15 +34,17 @@ func init() {
 	server = gin.Default()
 }
 
-// @Title Go Movie API
+// @title Go Movie API
+// @version 1.0
+// @description This is a RESTful API that provides information about Star Wars movies.
+
+// @host 0.0.0.0:8080
+// @BasePath /api/v1
 func main() {
-	configs, err := config.LoadConfig(".")
-	if err != nil {
-		log.Fatal("could not load environment variables", err)
-	}
+	configs, _ := config.LoadConfig(".")
 
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"http://localhost:8000", configs.ClientOrigin}
+	corsConfig.AllowOrigins = []string{"http://localhost:8080", configs.ClientOrigin}
 	corsConfig.AllowCredentials = true
 
 	server.Use(cors.New(corsConfig))
@@ -55,9 +57,9 @@ func main() {
 
 	//register the Swagger route and Swagger UI route
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	router.GET("/docs", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
-	})
+	// router.GET("/docs", func(c *gin.Context) {
+	// 	c.Redirect(http.StatusMovedPermanently, "/docs/index.html")
+	// })
 
 	MovieRouteController.MovieRoute(router)
 

@@ -24,3 +24,21 @@ type CharacterMetadata struct {
 	TotalHeightFt   float64 `json:"total_height_ft"`
 	TotalHeightIn   float64 `json:"total_height_"`
 }
+
+type ErrorResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
+type AddCommentRequest struct {
+	Comment string `json:"comment" binding:"required"`
+}
+
+type AddCommentResponse struct {
+	Data models.CreateCommentRequest `json:"data"`
+}
+
+// CharacterResponse represents the response for getting a list of characters for a movie
+type CharacterResponse struct {
+	Characters []string `json:"characters"`
+}

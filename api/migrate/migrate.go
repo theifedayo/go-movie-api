@@ -16,7 +16,7 @@ func init() {
 	config.ConnectToDB(&configs)
 }
 
-// Auto-Migrates models in models to DB.
+// Auto-Migrates models in models/ to DB.
 func main() {
 	config.DB.AutoMigrate(&models.Comment{}, &models.Movie{}, &models.Character{})
 	fmt.Println("Migration completed")

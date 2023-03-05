@@ -1,15 +1,180 @@
+basePath: /api/v1
+definitions:
+  models.CreateCommentRequest:
+    properties:
+      comment:
+        type: string
+      created_at:
+        type: string
+      ip:
+        type: string
+      movie_id:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - comment
+    type: object
+  responses.AddCommentRequest:
+    properties:
+      comment:
+        type: string
+    required:
+    - comment
+    type: object
+  responses.AddCommentResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.CreateCommentRequest'
+    type: object
+  responses.CharacterResponse:
+    properties:
+      characters:
+        items:
+          type: string
+        type: array
+    type: object
+  responses.ErrorResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  responses.MovieResponse:
+    properties:
+      comment_count:
+        type: integer
+      name:
+        type: string
+      opening_crawl:
+        type: string
+    type: object
+host: 0.0.0.0:8080
 info:
   contact: {}
+  description: This is a RESTful API that provides information about Star Wars movies.
   title: Go Movie API
+  version: "1.0"
 paths:
-  /api/v1/movies:
+  /movies:
     get:
-      consumes:
-      - application/json
-      description: Retrieves a list of movies sorted by release date, along with opening
-        crawls and comment count
+      description: Retrieves a list of movies sorted by release date, along with name,
+        opening crawls and comment count
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.MovieResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: Get a list of movies
+      tags:
+      - Movie
+  /movies/{movieId}/characters:
+    get:
+      description: Returns a list of characters for the specified movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - description: '[Optional] The field to sort the characters by one of name,
+          gender, or height'
+        in: query
+        name: sort
+        type: string
+      - description: '[Optional] Use asc or desc to sort in ascending or descending
+          order, respectively. For example, ?sort=height&order=desc will sort by height
+          in descending order, while ?sort=height&order=asc will sort by height in
+          ascending order'
+        in: query
+        name: order
+        type: string
+      - description: '[Optional] The filter criteria to apply to the characters to
+          filter by male or female. For example, ?gender=male will filter by male
+          characters and return only male characters and ?sort=height&order=desc&gender=female
+          will filter by female characters, listing only female characters with their
+          height in descending order'
+        in: query
+        name: gender
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.CharacterResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get characters for a movie
+      tags:
+      - Movie
+  /movies/{movieId}/comments:
+    get:
+      description: Returns a list of comments for the specified movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get a list of movies
+      tags:
+      - Movie
+    post:
+      consumes:
+      - application/json
+      description: Add a new comment for the specified movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - description: Comment request body
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/responses.AddCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/responses.AddCommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Add a new comment
+      tags:
+      - Movie
 swagger: "2.0"

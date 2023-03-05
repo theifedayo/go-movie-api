@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"net/http"
 	"sort"
 	"strconv"
@@ -27,19 +26,19 @@ func GetCharactersForMovie(movieId string, sortParam string, order string, gende
 
 	res, err := http.Get(url)
 	if err != nil {
-		return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+		return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 	}
 
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+		return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 	}
 
 	var movieData map[string]interface{}
 	err = json.Unmarshal(body, &movieData)
 	if err != nil {
-		return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+		return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 	}
 
 	charactersUrls := movieData["characters"].([]interface{})
@@ -51,24 +50,24 @@ func GetCharactersForMovie(movieId string, sortParam string, order string, gende
 	for _, characterUrl := range charactersUrls {
 		res, err := http.Get(characterUrl.(string))
 		if err != nil {
-			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+			return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 		}
 
 		defer res.Body.Close()
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+			return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 		}
 
 		var characterData map[string]interface{}
 		err = json.Unmarshal(body, &characterData)
 		if err != nil {
-			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+			return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 		}
 
 		heightCm, err := strconv.ParseFloat(strings.Replace(characterData["height"].(string), ",", "", -1), 64)
 		if err != nil {
-			return (http.StatusInternalServerError), gin.H{"status": "error", "data": err.Error()}
+			return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 		}
 
 		totalHeightCm += heightCm
@@ -117,6 +116,7 @@ func GetCharactersForMovie(movieId string, sortParam string, order string, gende
 	metadata.TotalHeightIn = cmToInch(totalHeightCm)
 
 	return (http.StatusOK), gin.H{
+		"status": "success",
 		"metadata": gin.H{
 			"total_count": len(characters),
 			"total_height": gin.H{
@@ -129,7 +129,6 @@ func GetCharactersForMovie(movieId string, sortParam string, order string, gende
 	}
 
 }
-
 
 //** Character Service Helpers**//
 
@@ -156,8 +155,6 @@ func sortByGender(characters []models.Character, gender string) ([]models.Charac
 	characters = filteredCharacters
 	return characters, totalHeightCm
 }
-
-
 
 func sortDescByName(characters []models.Character) []models.Character {
 	sort.Slice(characters, func(i, j int) bool {
@@ -202,14 +199,15 @@ func sortAscByHeight(characters []models.Character) []models.Character {
 }
 
 func cmToFeet(cm float64) float64 {
-	inches := cm * 0.3937
-	feet := math.Floor(inches / 12)
-	return feet
+	feet := cm / 30.48
+	return RoundToTwoDecimalPlaces(feet)
 }
 
 func cmToInch(cm float64) float64 {
-	inches := cm * 0.3937
-	feet := math.Floor(inches / 12)
-	inches = math.Round(inches - (feet * 12))
-	return inches
+	inches := cm / 2.54
+	return RoundToTwoDecimalPlaces(inches)
+}
+
+func RoundToTwoDecimalPlaces(num float64) float64 {
+	return float64(int(num*100)) / 100
 }
