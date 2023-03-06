@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "http://gomovie-api.herokuapp.com",
+    "host": "gomovie-api.herokuapp.com",
     "basePath": "/api/v1",
     "paths": {
         "/movies": {
