@@ -1,1 +1,1 @@
-web: go-movie-apis
+web: go-movie-api
