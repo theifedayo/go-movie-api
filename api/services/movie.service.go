@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sort"
 	"strings"
 	"time"
 
@@ -58,13 +57,6 @@ func ListMovies(ctx *gin.Context) (int, gin.H) {
 	if err != nil {
 		return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 	}
-
-	// Sort movies by release date
-	sort.Slice(movies.Results, func(i, j int) bool {
-		iDate, _ := time.Parse("2006-01-02", movies.Results[i].ReleaseDate)
-		jDate, _ := time.Parse("2006-01-02", movies.Results[j].ReleaseDate)
-		return iDate.Before(jDate)
-	})
 
 	for _, movie := range movies.Results {
 

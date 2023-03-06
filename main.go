@@ -37,7 +37,7 @@ func init() {
 // @title Go Movie API
 // @version 1.0
 // @description This is a RESTful API that provides information about Star Wars movies.
-// @host 0.0.0.0:8080
+// @host http://gomovie-api.herokuapp.com
 // @BasePath /api/v1
 func main() {
 	configs, _ := config.LoadConfig(".")
@@ -47,11 +47,14 @@ func main() {
 	corsConfig.AllowCredentials = true
 
 	server.Use(cors.New(corsConfig))
+	//redirect base url to swagger documentation
+	server.GET("/", func(ctx *gin.Context) {
+		ctx.Redirect(301, "/api/v1/docs/index.html")
+	})
 
 	router := server.Group("/api/v1")
 	router.GET("/healthchecker", func(ctx *gin.Context) {
-		message := "Welcome to Movie API"
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Welcome to Movie API"})
 	})
 
 	//register the Swagger route and Swagger UI route

@@ -50,7 +50,7 @@ definitions:
       opening_crawl:
         type: string
     type: object
-host: 0.0.0.0:8080
+host: http://gomovie-api.herokuapp.com
 info:
   contact: {}
   description: This is a RESTful API that provides information about Star Wars movies.

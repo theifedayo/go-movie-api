@@ -71,6 +71,8 @@ The server will run on http://0.0.0.0:8080 by default
 </br>
 
 ## Available Endpoints
+Base URL[dev]: 0.0.0.0:8080/\
+Base URL[prod]: http://gomovie-api.herokuapp.com/
 ### List Movies
 #### GET api/v1/movies
 Returns a list of movies with their opening crawls and comment count. The list is sorted by release date from earliest to newest.\
@@ -145,7 +147,7 @@ Response
             "id": 13,
             "movie_id": "4",
             "comment": "what an interesting movie. I would rate it 9/10",
-            "ip": "fe80::aede:48ff:fe00:1122",
+            "ip": "fe80::aede:48ff:fe00:1234",
             "created_at": "2023-03-04T06:15:25+01:00",
             "updated_at": "2023-03-04T06:15:25+01:00"
         },
@@ -153,7 +155,7 @@ Response
             "id": 12,
             "movie_id": "4",
             "comment": "what an interesting movie. I would rate it 9/10",
-            "ip": "fe80::aede:48ff:fe00:1122",
+            "ip": "fe80::aede:48ff:fe00:1234",
             "created_at": "2023-03-04T06:12:44.126034+01:00",
             "updated_at": "2023-03-04T06:12:44.126034+01:00"
         },
@@ -178,9 +180,9 @@ Returns a list of characters for the specified movie.\
 Request Parameters
 * `movieId` (int, required) - The Id of the movie to get characters for.
 Response
-* `sort`(optional): The field to sort the characters by one of name, gender, or height.
-* `order` (optional) - Use  `asc` or `desc` to sort in ascending or descending order, respectively. For example, ?sort=height&order=desc will sort by height in descending order, while ?sort=height&order=asc will sort by height in ascending order.
-* `gender`(optional) - The filter criteria to apply to the characters to filter by male or female. For example, ?gender=male will filter by male characters and return only male characters and \?sort=height&order=desc&gender=female will filter by female characters, listing only female characters with their height in descending order
+* `sort`(string, optional): The field to sort the characters by one of name, gender, or height.
+* `order` (string, optional) - Use  `asc` or `desc` to sort in ascending or descending order, respectively. For example, ?sort=height&order=desc will sort by height in descending order, while ?sort=height&order=asc will sort by height in ascending order.
+* `gender`(string, optional) - The filter criteria to apply to the characters to filter by male or female. For example, ?gender=male will filter by male characters and return only male characters and \?sort=height&order=desc&gender=female will filter by female characters, listing only female characters with their height in descending order
 * 200 OK on success\
 `api/v1/movies/:movieId/characters`
 ```json

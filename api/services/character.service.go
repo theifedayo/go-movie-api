@@ -65,18 +65,22 @@ func GetCharactersForMovie(movieId string, sortParam string, order string, gende
 			return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
 		}
 
-		heightCm, err := strconv.ParseFloat(strings.Replace(characterData["height"].(string), ",", "", -1), 64)
-		if err != nil {
-			return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
+		if characterData["height"] != "unknown" {
+			heightCm, err := strconv.ParseFloat(strings.Replace(characterData["height"].(string), ",", "", -1), 64)
+			if err != nil {
+				return (http.StatusInternalServerError), gin.H{"status": "error", "message": err.Error()}
+			}
+
+			totalHeightCm += heightCm
+
+			characters = append(characters, models.Character{
+				Name:   characterData["name"].(string),
+				Height: characterData["height"].(string),
+				Gender: characterData["gender"].(string),
+			})
+
 		}
 
-		totalHeightCm += heightCm
-
-		characters = append(characters, models.Character{
-			Name:   characterData["name"].(string),
-			Height: characterData["height"].(string),
-			Gender: characterData["gender"].(string),
-		})
 	}
 
 	// Filter characters by gender, if gender filter is provided
