@@ -37,7 +37,7 @@ func init() {
 // @title Go Movie API
 // @version 1.0
 // @description This is a RESTful API that provides information about Star Wars movies.
-// @host http://gomovie-api.herokuapp.com
+// @host gomovie-api.herokuapp.com
 // @BasePath /api/v1
 func main() {
 	configs, _ := config.LoadConfig(".")
