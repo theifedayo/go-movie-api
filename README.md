@@ -1,4 +1,4 @@
-# go-movie-api
+# GoFlicks
 ### Introduction
 This is a RESTful API built using Golang, GORM, Gin, Redis and Postgres that provides information about Star Wars movies. It includes endpoints to list movies with their opening crawls and comment count, add new comments to a movie, list comments for a movie, and get a list of characters for a movie.
 
